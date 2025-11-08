@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاسبه گر مظنه طلا</title>
+    <style>
+        body {
+            font-family: system-ui;
+            background: #f0f2f5;
+            margin: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .ratio {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .buy { color: #27ae60; }
+        .sell { color: #e74c3c; }
+        .hold { color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>💰 محاسبه گر مظنه طلا</h2>
+        
+        <div>
+            <input type="number" id="goldPrice" placeholder="قیمت اونس جهانی (دلار)" step="0.01">
+            <input type="number" id="usdFree" placeholder="نرخ دلار آزاد (تومان)" step="1000">
+            <input type="number" id="usdNimaii" placeholder="نرخ دلار نیمایی (تومان)" step="1000">
+            
+            <button onclick="calculate()">محاسبه کن</button>
+        </div>
+        
+        <div id="result" class="result" style="display:none">
+            <div>مظنه داخلی: <span id="internalResult">-</span> تومان</div>
+            <div>مظنه خارجی: <span id="externalResult">-</span> تومان</div>
+            <div class="ratio" id="ratioResult">-</div>
+            <div id="signalResult">-</div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // گرفتن مقادیر از کاربر
+            const gold = parseFloat(document.getElementById('goldPrice').value);
+            const usdF = parseFloat(document.getElementById('usdFree').value);
+            const usdN = parseFloat(document.getElementById('usdNimaii').value);
+            
+            if (!gold || !usdF || !usdN) {
+                alert("لطفا همه مقادیر را وارد کنید");
+                return;
+            }
+            
+            // محاسبه مظنه
+            const mazanehInternal = (gold * usdF * 0.705) / 31.103;
+            const mazanehExternal = (gold * usdN * 0.705) / 31.103;
+            const ratio = mazanehInternal / mazanehExternal;
+            
+            // نمایش نتایج
+            document.getElementById('internalResult').textContent = Math.round(mazanehInternal).toLocaleString();
+            document.getElementById('externalResult').textContent = Math.round(mazanehExternal).toLocaleString();
+            
+            const ratioElem = document.getElementById('ratioResult');
+            ratioElem.textContent = 'نسبت: ' + ratio.toFixed(2);
+            
+            const signalElem = document.getElementById('signalResult');
+            
+            if (ratio <= 1.3) {
+                ratioElem.className = 'ratio buy';
+                signalElem.textContent = '📈 سیگنال خرید';
+                signalElem.style.color = '#27ae60';
+            } else if (ratio >= 1.7) {
+                ratioElem.className = 'ratio sell';
+                signalElem.textContent = '📉 سیگنال فروش';
+                signalElem.style.color = '#e74c3c';
+            } else {
+                ratioElem.className = 'ratio hold';
+                signalElem.textContent = '⚡ نگهداری';
+                signalElem.style.color = '#f39c12';
+            }
+            
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
